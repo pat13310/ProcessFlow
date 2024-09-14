@@ -1,0 +1,8 @@
+# Default ignored files
+/../../ProcessFlowDesigner /.idea/shelf/
+/../../ProcessFlowDesigner /.idea/workspace.xml
+# Editor-based HTTP Client requests
+/../../ProcessFlowDesigner /.idea/httpRequests/
+# Datasource local storage ignored files
+/../../ProcessFlowDesigner /.idea/dataSources/
+/../../ProcessFlowDesigner /.idea/dataSources.local.xml
