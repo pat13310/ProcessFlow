@@ -9,6 +9,7 @@ from ui.Ui_ProcessFlow import Ui_ProcessFlow
 
 
 class ProcessFlow(QMainWindow, Ui_ProcessFlow):
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)
