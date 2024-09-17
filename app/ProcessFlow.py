@@ -3,7 +3,8 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsView
 
 from DiagramFlow.CircleShape import CircleShape
 from DiagramFlow.RectangleShape import RectangleShape
-from LineFlow.ConnectionBezier import ConnectionBezier
+from DiagramFlow.DiamondShape import DiamondShape
+from LineFlow.Connection import Connection
 from app.CustomGraphicsScene import CustomGraphicsScene  # Importer la scène personnalisée
 from ui.Ui_ProcessFlow import Ui_ProcessFlow
 
@@ -13,7 +14,6 @@ class ProcessFlow(QMainWindow, Ui_ProcessFlow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
-
 
         # Initialisation de la scène graphique personnalisée
         self.scene = CustomGraphicsScene(self)
@@ -36,35 +36,36 @@ class ProcessFlow(QMainWindow, Ui_ProcessFlow):
 
     def addShapes(self):
         # Ajouter un rectangle
-        process_shape = RectangleShape(50, 50, 100, 50, "Process")
-        self.scene.addItem(process_shape)
-        self.shapes.append(process_shape)
+        process1 = RectangleShape(50, 50, 100, 50, "Process1")
+        process2 = RectangleShape(250, 50, 100, 50, "Process2")
+        process3 = RectangleShape(50, 150, 150,50, "Process3")
+        process4 = RectangleShape(250, 150, 150, 50, "Process4")
+        self.addShape(process1)
+        self.addShape(process2)
+        self.addShape(process3)
+        self.addShape(process4)
 
-        # Ajouter un autre rectangle
-        another_shape = CircleShape(200, 100, 50, "Process 2")
-        self.scene.addItem(another_shape)
-        self.shapes.append(another_shape)
 
-        # Connecter les signaux de déplacement des formes à la mise à jour des lignes
-        process_shape.signals.positionChanged.connect(self.updateLines)
-        another_shape.signals.positionChanged.connect(self.updateLines)
-
-        # Connecter les signaux des propriétés des formes à la méthode de mise à jour de la table
-        process_shape.signals.propertiesChanged.connect(self.updateProperties)
-        another_shape.signals.propertiesChanged.connect(self.updateProperties)
+    def addShape(self, shape):
+        self.scene.addItem(shape)
+        self.shapes.append(shape)
+        shape.signals.positionChanged.connect(self.updateLines)
+        shape.signals.propertiesChanged.connect(self.updateProperties)
 
     def connectShapes(self):
         if len(self.shapes) >= 2:
-            # Créer une ligne de connexion entre les deux premiers objets
-            line = ConnectionBezier(self.shapes[0], self.shapes[1])
+            start_port = self.shapes[0].right_port
+            end_port = self.shapes[1].left_port
+            line = Connection(start_port, end_port)
             line.signals.propertiesChanged.connect(self.updateProperties)
             self.scene.addItem(line)
             self.lines.append(line)
+            start_port.connect_to(end_port)
 
     def updateLines(self):
-        # Mettre à jour les positions des lignes de connexion
         for line in self.lines:
             line.update_position()
+
 
     def updateProperties(self, properties):
         # Effacer toutes les lignes existantes du modèle

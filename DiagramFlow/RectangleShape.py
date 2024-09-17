@@ -1,104 +1,80 @@
 from PySide6.QtCore import Qt, QPointF
-from PySide6.QtWidgets import QGraphicsRectItem
-from PySide6.QtGui import QBrush, QPen, QColor, QPainter, QFont
-
+from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsTextItem
+from PySide6.QtGui import QBrush, QPen, QColor, QFont
 from DiagramFlow.SignalShape import SignalShape
-
+from LineFlow.IOPort import IOPort
 
 class RectangleShape(QGraphicsRectItem):
-    GRID_SIZE = 25  # Taille de chaque cellule de la grille
+    GRID_SIZE = 25
 
-    def __init__(self, x, y, width, height, text):
+    def __init__(self, x, y, width, height, text, default_color=QColor("#FFC8C8"), selected_color=QColor("#C8C8FF")):
         super().__init__(x, y, width, height)
-
-        # Instance de SignalShape pour émettre des signaux
         self.signals = SignalShape()
-
-        self.connections = []  # Stocker les connexions associées
+        self.connections = []
         self.text = text
-        self.handles = []  # Poignées de sélection
+        self.handles = []
+        self.connection_points = []
 
-        # Personnalisation de l'apparence de la forme
-        self.default_pen = QPen(QColor("#000000"), 1)  # Contour noir par défaut
-        self.selected_pen = QPen(QColor("#0000FF"), 1, Qt.DashLine)  # Contour bleu en tirets lorsque sélectionné
+        # Apparence
+        self.default_pen = QPen(QColor("#000000"), 1)
+        self.selected_pen = QPen(QColor("#0000FF"), 1, Qt.DashLine)
         self.current_pen = self.default_pen
-
-        self.default_brush = QBrush(QColor("#FFC8C8"))  # Remplissage par défaut
-        self.selected_brush = QBrush(QColor("#C8C8FF"))  # Remplissage lorsque sélectionné
+        self.default_brush = QBrush(default_color)
+        self.selected_brush = QBrush(selected_color)
         self.current_brush = self.default_brush
-
-        # Appliquer l'apparence par défaut
         self.setPen(self.current_pen)
         self.setBrush(self.current_brush)
 
-        # Activer les événements et les flags nécessaires
-        self.setAcceptHoverEvents(True)  # Gérer les événements de survol
+        # Flags
+        self.setAcceptHoverEvents(True)
         self.setFlags(QGraphicsRectItem.ItemIsMovable |
                       QGraphicsRectItem.ItemSendsGeometryChanges |
-                      QGraphicsRectItem.ItemIsSelectable)  # Permettre le déplacement et la sélection
+                      QGraphicsRectItem.ItemIsSelectable)
 
-        # Poignées de sélection (carrés jaunes)
+        # Initialisation
         self.init_handles()
-
-        # Magnétiser le rectangle sur la grille à la création
+        self.init_connection_points()
+        self.init_text()
         self.snap_to_grid()
 
     def init_handles(self):
-        # Crée quatre poignées pour les coins du rectangle
-        for i in range(4):
+        for _ in range(4):
             handle = QGraphicsRectItem(0, 0, 6, 6, self)
-            handle.setPen(QPen(QColor("#AFFA00"), 2, Qt.SolidLine))  # Couleur de bordure des poignées en jaune
+            handle.setPen(QPen(QColor("#AFFA00"), 2, Qt.SolidLine))
             handle.setBrush(QBrush(QColor("#FFFF00")))
             handle.setVisible(False)
             self.handles.append(handle)
         self.update_handles()
 
+    def init_connection_points(self):
+        self.left_port = IOPort(self, is_input=True)
+        self.right_port = IOPort(self, is_input=False)
+        self.connection_points.append(self.left_port)
+        self.connection_points.append(self.right_port)
+        self.calculate_positions()
+
+    def init_text(self):
+        self.text_item = QGraphicsTextItem(self.text, self)
+        self.text_item.setFont(QFont("Arial", 10))
+        self.update_text_position()
+
     def update_handles(self):
-        # Positionner les poignées aux quatre coins du rectangle
         rect = self.rect()
-        self.handles[0].setPos(rect.topLeft() - QPointF(3, 3))
-        self.handles[1].setPos(rect.topRight() - QPointF(3, 3))
-        self.handles[2].setPos(rect.bottomLeft() - QPointF(3, 3))
-        self.handles[3].setPos(rect.bottomRight() - QPointF(3, 3))
-
-    def paint(self, painter, option, widget=None):
-        # Dessiner le rectangle
-        painter.setPen(self.current_pen)
-        painter.setBrush(self.current_brush)
-        painter.drawRect(self.rect())
-
-        # Configurer le style du texte
-        painter.setPen(QPen(QColor("#000000")))  # Couleur du texte
-        font = QFont()
-        font.setBold(True)
-        painter.setFont(font)
-
-        # Centrer le texte
-        rect = self.rect()
-        painter.drawText(rect, Qt.AlignCenter, self.text)
+        positions = [rect.topLeft(), rect.topRight(), rect.bottomLeft(), rect.bottomRight()]
+        for handle, pos in zip(self.handles, positions):
+            handle.setPos(pos - QPointF(3, 3))
 
     def set_selected(self, selected):
-        # Mettre à jour l'état de sélection et l'apparence
-        if selected:
-            self.current_pen = self.selected_pen
-            self.current_brush = self.selected_brush
-            for handle in self.handles:
-                handle.setVisible(True)  # Afficher les poignées de sélection
-
-            # Envoyer les propriétés via le signal
-            self.emit_properties()
-        else:
-            self.current_pen = self.default_pen
-            self.current_brush = self.default_brush
-            for handle in self.handles:
-                handle.setVisible(False)  # Masquer les poignées de sélection
-
-        # Appliquer l'apparence mise à jour
+        self.current_pen = self.selected_pen if selected else self.default_pen
+        self.current_brush = self.selected_brush if selected else self.default_brush
+        for handle in self.handles:
+            handle.setVisible(selected)
         self.setPen(self.current_pen)
         self.setBrush(self.current_brush)
+        if selected:
+            self.emit_properties()
 
     def emit_properties(self):
-        # Émettre les propriétés de l'objet sous forme de dictionnaire
         properties = {
             'Texte': self.text,
             'Position X': self.pos().x(),
@@ -109,48 +85,60 @@ class RectangleShape(QGraphicsRectItem):
         self.signals.propertiesChanged.emit(properties)
 
     def mousePressEvent(self, event):
-        # Gérer l'événement de clic de souris pour sélectionner/désélectionner manuellement
-        self.set_selected(not self.is_selected())  # Inverser l'état de sélection
-        super().mousePressEvent(event)  # Appeler l'événement de base pour gérer les autres comportements
+        self.set_selected(not self.isSelected())
+        super().mousePressEvent(event)
 
     def itemChange(self, change, value):
         if change == QGraphicsRectItem.ItemPositionChange:
-            # Magnétiser la position sur la grille
-            new_pos = value
-            snapped_pos = self.snap_to_grid_position(new_pos)
-
-            # Émettre le signal de changement de position avec la nouvelle position
-            self.signals.positionChanged.emit(snapped_pos)
-
-            # Mettre à jour les poignées de sélection
+            new_pos = self.snap_to_grid_position(value)
+            self.signals.positionChanged.emit(new_pos)
             self.update_handles()
-            return snapped_pos
-
-        # Si l'état de sélection change, mettre à jour l'apparence
+            self.update_connection_points()
+            self.update_text_position()
+            return new_pos
         elif change == QGraphicsRectItem.ItemSelectedChange:
             self.set_selected(value)
-
         return super().itemChange(change, value)
 
+    def calculate_positions(self):
+        rect = self.rect()
+        self.left_port.setPos(rect.left() - 5, rect.center().y() - 5)
+        self.right_port.setPos(rect.right() - 5, rect.center().y() - 5)
+
+    def update_connection_points(self):
+        self.calculate_positions()
+
+    def update_text_position(self):
+        rect = self.rect()
+        self.text_item.setPos(rect.center() - self.text_item.boundingRect().center())
+
     def snap_to_grid(self):
-        # Magnétiser la position initiale du rectangle sur la grille
-        current_pos = self.pos()
-        snapped_pos = self.snap_to_grid_position(current_pos)
-        self.setPos(snapped_pos)
+        self.setPos(self.snap_to_grid_position(self.pos()))
 
     def snap_to_grid_position(self, position):
-        # Calculer la position magnétisée sur la grille
-        snapped_x = round(position.x() / self.GRID_SIZE) * self.GRID_SIZE
-        snapped_y = round(position.y() / self.GRID_SIZE) * self.GRID_SIZE
-        return QPointF(snapped_x, snapped_y)
+        return QPointF(
+            round(position.x() / self.GRID_SIZE) * self.GRID_SIZE,
+            round(position.y() / self.GRID_SIZE) * self.GRID_SIZE
+        )
 
     def add_connection(self, connection):
-        self.connections.append(connection)
+        if connection not in self.connections:
+            self.connections.append(connection)
 
     def remove_connection(self, connection):
         if connection in self.connections:
             self.connections.remove(connection)
 
     def is_selected(self):
-        # Retourner l'état de sélection actuel
-        return self.current_pen == self.selected_pen
+        return self.isSelected()
+
+    def set_text(self, new_text):
+        self.text = new_text
+        self.text_item.setPlainText(new_text)
+        self.update_text_position()
+
+    def get_input_port(self):
+        return self.left_port
+
+    def get_output_port(self):
+        return self.right_port
