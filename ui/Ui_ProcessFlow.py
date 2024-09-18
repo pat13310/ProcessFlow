@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'flowprocessfMBosl.ui'
+## Form generated from reading UI file 'flowprocessBnkFeA.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.0
 ##
@@ -23,7 +23,7 @@ class Ui_ProcessFlow(object):
     def setupUi(self, ProcessFlow):
         if not ProcessFlow.objectName():
             ProcessFlow.setObjectName(u"ProcessFlow")
-        ProcessFlow.resize(1137, 591)
+        ProcessFlow.resize(1207, 591)
         self.centralwidget = QWidget(ProcessFlow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
@@ -69,6 +69,7 @@ class Ui_ProcessFlow(object):
         self.widget_3.setObjectName(u"widget_3")
         sizePolicy.setHeightForWidth(self.widget_3.sizePolicy().hasHeightForWidth())
         self.widget_3.setSizePolicy(sizePolicy)
+        self.widget_3.setMinimumSize(QSize(250, 0))
         self.verticalLayout_2 = QVBoxLayout(self.widget_3)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(2, 2, 2, -1)
@@ -90,7 +91,7 @@ class Ui_ProcessFlow(object):
         ProcessFlow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(ProcessFlow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1137, 33))
+        self.menubar.setGeometry(QRect(0, 0, 1207, 33))
         ProcessFlow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(ProcessFlow)
         self.statusbar.setObjectName(u"statusbar")

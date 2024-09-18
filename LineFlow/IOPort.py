@@ -10,27 +10,35 @@ class IOPort(QGraphicsEllipseItem):
         self.is_input = is_input
         self.connected_to = None
         # Composez le nom du port en fonction du nom du parent et du type de port
-        parent_name = parent_shape.text if hasattr(parent_shape, 'text') else 'Inconnu'
+        parent_name = parent_shape.shape_name if hasattr(parent_shape, 'shape_name') else 'Inconnu'
         suffix = "_E" if is_input else "_S"
         self.name = f"{parent_name}{suffix}"
 
         self.setPen(QPen(QColor("#000000")))
-        self.setBrush(QBrush(QColor("lightgreen")))
         self.setAcceptHoverEvents(True)
         self.setCursor(Qt.CrossCursor)
         self.signals = SignalShape()
         self.is_selected = False
 
+        self.defaut_status()
+
+    def defaut_status(self):
+        if self.is_input:
+            self.setBrush(QBrush(QColor("lightgreen")))
+        else:
+            self.setBrush(QBrush(QColor("#D9f970")))
+
     def hoverEnterEvent(self, event):
         if self.scene().is_connecting and not self.is_selected:
             self.setBrush(QBrush(QColor("lightyellow")))
         elif not self.is_selected:
-            self.setBrush(QBrush(QColor("lightgreen")))
+            self.defaut_status()
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
         if not self.is_selected and not self.is_connected():
-            self.setBrush(QBrush(QColor("lightgreen")))
+            self.defaut_status()
+
         super().hoverLeaveEvent(event)
 
     def mousePressEvent(self, event):
@@ -45,11 +53,7 @@ class IOPort(QGraphicsEllipseItem):
         super().mouseReleaseEvent(event)
 
     def can_connect(self, other_port):
-        # Règle 1: Pas de connexion entre ports du même parent
-        #if self == other_port:
-        #if other_port is None:
-        #    return False
-        #    return False
+
         if isinstance(other_port, IOPort):
         # Règle 2 et 3: Pas de connexion entre ports de même type
             if self.is_input == other_port.is_input:
@@ -86,9 +90,10 @@ class IOPort(QGraphicsEllipseItem):
     def set_selected(self, selected):
         self.is_selected = selected
         if selected:
-            self.setBrush(QBrush(QColor("yellow")))
+            self.setBrush(QBrush(QColor("#A0A0FF")))
         else:
-            self.setBrush(QBrush(QColor("lightgreen")))
+            self.defaut_status()
+
 
     def reset_state(self):
         self.set_selected(False)

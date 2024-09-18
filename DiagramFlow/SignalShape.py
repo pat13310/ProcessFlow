@@ -6,7 +6,7 @@ class SignalShape(QObject):
     propertiesChanged = Signal(dict)  # Signal émis pour envoyer les propriétés
     connectionInitiated = Signal(object, QPointF)  # Signal pour initier une connexion
     connectionCompleted = Signal(object, QPointF)  # Signal pour initier une connexion
-
+    connectionCreated = Signal(object)
 
     def __init__(self):
         super().__init__()

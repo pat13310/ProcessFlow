@@ -1,10 +1,10 @@
 from PySide6.QtGui import QPainter, QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsView
 
-from DiagramFlow.CircleShape import CircleShape
 from DiagramFlow.RectangleShape import RectangleShape
-from DiagramFlow.DiamondShape import DiamondShape
 from LineFlow.Connection import Connection
+from Process.Process import Process
+from Process.Task import Task
 from app.CustomGraphicsScene import CustomGraphicsScene  # Importer la scène personnalisée
 from ui.Ui_ProcessFlow import Ui_ProcessFlow
 
@@ -18,6 +18,7 @@ class ProcessFlow(QMainWindow, Ui_ProcessFlow):
         # Initialisation de la scène graphique personnalisée
         self.scene = CustomGraphicsScene(self)
         self.graphicsView.setScene(self.scene)
+        self.scene.signals.connectionCreated.connect(self.onCreatedConnection)
         self.graphicsView.setRenderHint(QPainter.Antialiasing)
         self.graphicsView.setDragMode(QGraphicsView.RubberBandDrag)
 
@@ -32,12 +33,18 @@ class ProcessFlow(QMainWindow, Ui_ProcessFlow):
         self.property_table_model = QStandardItemModel()
         self.tableView.setModel(self.property_table_model)
         self.property_table_model.setHorizontalHeaderLabels(["Propriété", "Valeur"])
+        self.setWindowTitle("Process Flow - Designer")
 
+
+    def onCreatedConnection(self, connection:Connection):
+        connection.signals.propertiesChanged.connect(self.updateProperties)
 
     def addShapes(self):
         # Ajouter un rectangle
-        process1 = RectangleShape(50, 50, 100, 50, "Process1")
-        process2 = RectangleShape(250, 50, 100, 50, "Process2")
+        p1=Task("Calcul")
+        p2=Task("Trier")
+        process1 = RectangleShape(50, 50, 100, 50, "Process1",task=p1)
+        process2 = RectangleShape(250, 50, 100, 50, "Process2",task=p2)
         process3 = RectangleShape(50, 150, 150,50, "Process3")
         process4 = RectangleShape(250, 150, 150, 50, "Process4")
         self.addShape(process1)
@@ -66,16 +73,31 @@ class ProcessFlow(QMainWindow, Ui_ProcessFlow):
         for line in self.lines:
             line.update_position()
 
-
     def updateProperties(self, properties):
         # Effacer toutes les lignes existantes du modèle
         self.clearTableData()
 
-        # Ajouter les nouvelles propriétés à la table
-        for prop, value in properties.items():
-            prop_item = QStandardItem(str(prop))
-            value_item = QStandardItem(str(value))
-            self.property_table_model.appendRow([prop_item, value_item])
+        # Déterminer le type de la forme
+        shape_type = properties.get('Type de forme', None)
+
+        # Définir l'ordre des propriétés par type de forme
+        properties_order = {
+            'RectangleShape': ['Nom de la forme', 'Position X', 'Position Y', 'Largeur', 'Hauteur'],
+            'CircleShape': ['Nom de la forme', 'Position X', 'Position Y', 'Rayon'],
+            'DiamondShape': ['Nom de la forme', 'Position X', 'Position Y', 'Largeur', 'Hauteur', 'Angle'],
+            # Ajouter d'autres types de formes si nécessaire
+        }
+
+        # Obtenir l'ordre des propriétés pour le type de forme actuel
+        order = properties_order.get(shape_type, list(
+            properties.keys()))  # Défaut à l'ordre naturel des clés si le type n'est pas trouvé
+
+        # Ajouter les propriétés à la table dans l'ordre défini
+        for prop in order:
+            if prop in properties:
+                prop_item = QStandardItem(str(prop))
+                value_item = QStandardItem(str(properties[prop]))
+                self.property_table_model.appendRow([prop_item, value_item])
 
     def clearTableData(self):
         # Supprimer toutes les lignes du modèle
