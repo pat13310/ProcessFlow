@@ -8,6 +8,15 @@ from Process.Task import Task
 from app.CustomGraphicsScene import CustomGraphicsScene  # Importer la scène personnalisée
 from ui.Ui_ProcessFlow import Ui_ProcessFlow
 
+def func_compteur(compteur=1000000):
+    for i in range(compteur):
+        print(i)
+
+def func_paire(compteur=1000000):
+    for i in range(compteur):
+        if i % 2 == 0:
+            print(i)
+
 
 class ProcessFlow(QMainWindow, Ui_ProcessFlow):
 
@@ -43,8 +52,8 @@ class ProcessFlow(QMainWindow, Ui_ProcessFlow):
         # Ajouter un rectangle
         p1=Task("Calcul")
         p2=Task("Trier")
-        process1 = RectangleShape(50, 50, 100, 50, "Process1",task=p1)
-        process2 = RectangleShape(250, 50, 100, 50, "Process2",task=p2)
+        process1 = RectangleShape(50, 50, 100, 50, "Compteur",function=func_compteur)
+        process2 = RectangleShape(250, 50, 100, 50, "Compteur2",function=func_paire)
         process3 = RectangleShape(50, 150, 150,50, "Process3")
         process4 = RectangleShape(250, 150, 150, 50, "Process4")
         self.addShape(process1)
@@ -78,17 +87,14 @@ class ProcessFlow(QMainWindow, Ui_ProcessFlow):
         self.clearTableData()
 
         # Déterminer le type de la forme
-        shape_type = properties.get('Type de forme', None)
+        shape_type = properties.get('Type', None)
 
-        # Définir l'ordre des propriétés par type de forme
         properties_order = {
-            'RectangleShape': ['Nom de la forme', 'Position X', 'Position Y', 'Largeur', 'Hauteur'],
+            'RectangleShape': ['Nom', 'X', 'Y', 'Largeur', 'Hauteur','Type',"Tâche","État"],
             'CircleShape': ['Nom de la forme', 'Position X', 'Position Y', 'Rayon'],
             'DiamondShape': ['Nom de la forme', 'Position X', 'Position Y', 'Largeur', 'Hauteur', 'Angle'],
-            # Ajouter d'autres types de formes si nécessaire
         }
 
-        # Obtenir l'ordre des propriétés pour le type de forme actuel
         order = properties_order.get(shape_type, list(
             properties.keys()))  # Défaut à l'ordre naturel des clés si le type n'est pas trouvé
 
@@ -100,7 +106,6 @@ class ProcessFlow(QMainWindow, Ui_ProcessFlow):
                 self.property_table_model.appendRow([prop_item, value_item])
 
     def clearTableData(self):
-        # Supprimer toutes les lignes du modèle
         self.property_table_model.removeRows(0, self.property_table_model.rowCount())
 
 if __name__ == "__main__":

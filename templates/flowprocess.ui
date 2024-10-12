@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1207</width>
-    <height>591</height>
+    <width>1259</width>
+    <height>709</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">color:white;
+background-color: #444444;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -44,25 +48,26 @@
          <number>2</number>
         </property>
         <item>
-         <widget class="QListView" name="listView"/>
+         <widget class="QListView" name="listView">
+          <property name="styleSheet">
+           <string notr="true">background-color: #313131;</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="widget_2" native="true">
+      <widget class="QWidget" name="main" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>2</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: #888;</string>
+       </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
-        <property name="leftMargin">
-         <number>2</number>
-        </property>
-        <property name="topMargin">
-         <number>2</number>
-        </property>
-        <property name="rightMargin">
+        <property name="bottomMargin">
          <number>2</number>
         </property>
         <item>
@@ -73,6 +78,119 @@
             <height>0</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget_4" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>35</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>35</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: #686868;</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QPushButton" name="btn_play">
+             <property name="styleSheet">
+              <string notr="true">QPushButton{
+	color:white;
+}
+QPushButton:hover{
+
+background-color: #999;
+}
+</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset theme="media-playback-start"/>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_pause">
+             <property name="styleSheet">
+              <string notr="true">QPushButton::hover{
+	color: rgb(0, 255, 127);
+	background-color: #00ff7f;
+}</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset theme="media-playback-pause"/>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btn_stop">
+             <property name="styleSheet">
+              <string notr="true">QPushButton::hover{
+	color: rgb(0, 255, 127);
+	background-color: #00ff7f;
+}</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset theme="media-playback-stop"/>
+             </property>
+             <property name="flat">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
         </item>
        </layout>
@@ -89,6 +207,9 @@
          <width>250</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: #616161;</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="leftMargin">
@@ -108,6 +229,10 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(61, 61, 61);
+color:white;</string>
+          </property>
           <attribute name="verticalHeaderVisible">
            <bool>false</bool>
           </attribute>
@@ -124,12 +249,62 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1207</width>
+     <width>1259</width>
      <height>33</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFichier">
+    <property name="title">
+     <string>Fichier</string>
+    </property>
+    <addaction name="actionNouveau"/>
+    <addaction name="separator"/>
+    <addaction name="actionSAuver"/>
+    <addaction name="actionSauver_sous"/>
+    <addaction name="actionExporter"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuitter"/>
+   </widget>
+   <widget class="QMenu" name="menuAide">
+    <property name="title">
+     <string>Aide</string>
+    </property>
+    <addaction name="actionA_propos_de"/>
+   </widget>
+   <addaction name="menuFichier"/>
+   <addaction name="menuAide"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionA_propos_de">
+   <property name="text">
+    <string>A propos de ...</string>
+   </property>
+  </action>
+  <action name="actionNouveau">
+   <property name="text">
+    <string>Nouveau</string>
+   </property>
+  </action>
+  <action name="actionSAuver">
+   <property name="text">
+    <string>Sauver</string>
+   </property>
+  </action>
+  <action name="actionSauver_sous">
+   <property name="text">
+    <string>Sauver sous</string>
+   </property>
+  </action>
+  <action name="actionQuitter">
+   <property name="text">
+    <string>Quitter</string>
+   </property>
+  </action>
+  <action name="actionExporter">
+   <property name="text">
+    <string>Exporter</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

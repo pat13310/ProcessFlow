@@ -9,13 +9,14 @@ from Process.Task import Task, TaskState
 
 class RectangleShape(QGraphicsRectItem):
 
-    def __init__(self, x, y, width, height, shape_name: str,
-                 task: Task = None, default_color=QColor("#FFC8C8"), selected_color=QColor("#C8C8FF"), grid=25):
+    def __init__(self, x, y, width, height, title: str,
+                 function= None, default_color=QColor("#FFC8C8"), selected_color=QColor("#C8C8FF"), grid=25,*args, **kwargs):
         super().__init__(x, y, width, height)
         self.signals = SignalShape()
         self.connections = []
-        self.shape_name = shape_name
-        self.task = task  # Peut être None au départ
+        self.shape_name = title
+        self.task=None
+        self.function = function  # Peut être None au départ
         self.handles = []
         self.connection_points = []
         self.grid = grid
@@ -108,10 +109,10 @@ class RectangleShape(QGraphicsRectItem):
         """Émet les propriétés actuelles de la forme."""
         x, y = self.scenePos().x(), self.scenePos().y()
         properties = {
-            'Type de forme': 'RectangleShape',
-            'Nom de la forme': self.shape_name,
-            'Position X': x,
-            'Position Y': y,
+            'Nom': self.shape_name,
+            'Type': 'RectangleShape',
+            'X': x,
+            'Y': y,
             'Largeur': self.rect().width(),
             'Hauteur': self.rect().height()
         }
@@ -230,7 +231,7 @@ class RectangleShape(QGraphicsRectItem):
     def run_process(self):
         """Exécute la tâche associée au rectangle."""
         if self.task is None or self.task.get_state() == TaskState.STOPPED:
-            self.task = Task(self.shape_name)  # Créer une nouvelle instance de Task
+            self.task = Task(self.shape_name, self.function)  # Créer une nouvelle instance de Task
             self.task.signals.signalStateChanged.connect(self.update_appearance)
 
         # Exécuter la nouvelle tâche dans un thread séparé via le thread pool
@@ -265,3 +266,6 @@ class RectangleShape(QGraphicsRectItem):
         self.update()
         if self.scene():
             self.scene().invalidate(self.boundingRect())
+
+        if self.task:
+            self.emit_properties()
