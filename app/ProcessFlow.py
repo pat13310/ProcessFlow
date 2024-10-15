@@ -3,10 +3,10 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QGraphicsView
 
 from DiagramFlow.RectangleShape import RectangleShape
 from LineFlow.Connection import Connection
-from Process.Process import Process
 from Process.Task import Task
 from app.CustomGraphicsScene import CustomGraphicsScene  # Importer la scène personnalisée
 from ui.Ui_ProcessFlow import Ui_ProcessFlow
+
 
 def func_compteur(compteur=1000000):
     for i in range(compteur):
